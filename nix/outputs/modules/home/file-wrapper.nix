@@ -296,7 +296,7 @@ in
           fileSourceExists =
             source:
             pipe source [
-              toAbsolutePathAccess
+              toAbsolutePathSymlink
               pathExists
             ];
           fileSets = with config.fileWrapper; [
