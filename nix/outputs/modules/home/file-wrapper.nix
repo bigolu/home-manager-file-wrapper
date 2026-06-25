@@ -25,14 +25,9 @@ let
     pipe
     splitString
     length
-    pathExists
-    filter
-    attrValues
     listToAttrs
     hasAttr
-    concatMap
     id
-    optional
     ;
   inherit (lib.filesystem) listFilesRecursive;
   inherit (lib.strings) unsafeDiscardStringContext;
@@ -290,37 +285,8 @@ in
         in
         accumulator // homeManagerFileSet
       ) { };
-
-      assertions =
-        let
-          fileSourceExists =
-            source:
-            pipe source [
-              toAbsolutePathSymlink
-              pathExists
-            ];
-          fileSets = with config.fileWrapper; [
-            home.file
-            xdg.configFile
-            xdg.dataFile
-            xdg.executable
-          ];
-          missingFileSourcesJoined = pipe fileSets [
-            (concatMap attrValues)
-            (map (file: file.source))
-            (filter (source: !(fileSourceExists source)))
-            (concatStringsSep " ")
-          ];
-
-          allFileSourcesExist = missingFileSourcesJoined == "";
-        in
-        optional config.fileWrapper.settings.editableInstall {
-          assertion = allFileSourcesExist;
-          message = "The following config.fileWrapper file sources do not exist: ${missingFileSourcesJoined}";
-        };
     in
     {
-      inherit assertions;
       home.file =
         (toHomeManagerFileSet config.fileWrapper.home.file)
         // (toHomeManagerFileSet config.fileWrapper.xdg.executable);
