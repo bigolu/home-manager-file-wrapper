@@ -7,7 +7,6 @@
 {
   lib,
   config,
-  utils,
   pkgs,
   ...
 }:
@@ -32,8 +31,9 @@ let
   inherit (lib.filesystem) listFilesRecursive;
   inherit (lib.strings) unsafeDiscardStringContext;
   inherit (config.lib.file) mkOutOfStoreSymlink;
-  inherit (utils) callIf;
   inherit (pkgs) runCommand;
+
+  callIf = condition: function: if condition then function else (x: x);
 in
 {
   options.fileWrapper =
