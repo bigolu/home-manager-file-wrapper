@@ -183,10 +183,10 @@ in
       isRelativePath = path: !hasPrefix "/" path;
       relativePathRootSymlink = config.fileWrapper.settings.relativePathRoot.symlink;
       relativePathRootAccess = config.fileWrapper.settings.relativePathRoot.access;
-      toAbsolutePathSymlink =
+      toAbsoluteSymlinkPath =
         fileSource:
         if isRelativePath fileSource then "${relativePathRootSymlink}/${fileSource}" else fileSource;
-      toAbsolutePathAccess =
+      toAbsoluteAccessPath =
         fileSource:
         if isRelativePath fileSource then "${relativePathRootAccess}/${fileSource}" else fileSource;
 
@@ -222,9 +222,9 @@ in
             (
               source:
               if isEditableInstall then
-                (mkOutOfStoreSymlink (toAbsolutePathSymlink source))
+                (mkOutOfStoreSymlink (toAbsoluteSymlinkPath source))
               else
-                toAbsolutePathAccess source
+                toAbsoluteAccessPath source
             )
             (callIf (isExecutable file && !isEditableInstall) replaceShebangInterpreter)
           ];
@@ -253,7 +253,7 @@ in
       getHomeManagerFileSetForFilesInDirectory =
         directory:
         pipe directory.source [
-          toAbsolutePathAccess
+          toAbsoluteAccessPath
           config.fileWrapper.settings.directoryFilter
 
           # Use relative paths to account for the case where
